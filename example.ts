@@ -1,8 +1,8 @@
-import { slatt, app, route } from './slatt.ts'
 import { pipe } from 'https://deno.land/x/rambda@v6.7.0/pipe.js'
-import type { SlattMiddleware, SlattRequestHandler } from './slatt.ts'
+import { cobain, app, route } from './cobain.ts'
+import type { CobainMiddleware, CobainRequestHandler } from './cobain.ts'
 
-const middleware: SlattMiddleware = (handler) => (ctx) => {
+const middleware: CobainMiddleware = (handler) => (ctx) => {
     console.log(`middleware called`)
     if (typeof handler !== 'undefined') {
         console.log(`handler bb`)
@@ -11,7 +11,7 @@ const middleware: SlattMiddleware = (handler) => (ctx) => {
     ctx.req.respond({ status: 200, body: `MIDDLEWARE` })
 }
 
-const fallthroughMiddleware: SlattMiddleware = handler => async ctx => {
+const fallthroughMiddleware: CobainMiddleware = handler => async ctx => {
     if (handler) {
         console.log(`before:TEST`)
         await handler(ctx)
@@ -19,7 +19,7 @@ const fallthroughMiddleware: SlattMiddleware = handler => async ctx => {
     }
 }
 
-const allUsers: SlattRequestHandler = (ctx) => {
+const allUsers: CobainRequestHandler = (ctx) => {
     console.log(`useriso`)
     ctx.req.respond({ status: 200, body: `hello world` })
 }
@@ -31,7 +31,7 @@ const users = app(
     )(allUsers))
 )
 
-const exampleApp = slatt({ port: 3333, hostname: '127.0.0.1' })(
+const exampleApp = cobain({ port: 3333, hostname: '127.0.0.1' })(
     // route(middleware()),
     // middleware(),
     fallthroughMiddleware(users)

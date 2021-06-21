@@ -1,29 +1,29 @@
 import { serve, HTTPOptions, ServerRequest } from "https://deno.land/std@0.98.0/http/server.ts"
 
-const defaultSlattContext = {
+const defaultCobainContext = {
     local: {},
     plugins: []
 }
 
-export const slatt: Slatt = (addr, opts: unknown = defaultSlattContext) => {
+export const cobain: Cobain = (addr, opts: unknown = defaultCobainContext) => {
     return (...middleware) => {
         for (const fn of middleware) {
             if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!')
         }
 
-        function createContext(req: ServerRequest): SlattContext {
+        function createContext(req: ServerRequest): CobainContext {
             return {
                 req,
                 local: opts
             }
         }
-        async function respond(ctx: SlattContext): Promise<void> {
+        async function respond(ctx: CobainContext): Promise<void> {
             // if (ctx.req.)
             // ctx.req.
         }
 
         // Shoutout the Koa team (https://github.com/koajs/compose)
-        const compose = (ctx: SlattContext) => {
+        const compose = (ctx: CobainContext) => {
             let index = -1
             return dispatch(0)
             function dispatch (i: number) {
@@ -63,24 +63,24 @@ export const slatt: Slatt = (addr, opts: unknown = defaultSlattContext) => {
     }
 }
 
-export interface SlattInstance {
+export interface CobainInstance {
     start: () => Promise<void>
     handleRequest: (req: ServerRequest) => Promise<void>
 }
 
-export type Slatt = (addr: string | HTTPOptions, opts?: unknown) => 
-    (...middleware: SlattRequestHandler[]) => SlattInstance
+export type Cobain = (addr: string | HTTPOptions, opts?: unknown) => 
+    (...middleware: CobainRequestHandler[]) => CobainInstance
 
-export interface SlattContext {
+export interface CobainContext {
     local: unknown
     req: ServerRequest
 }
 
-export type SlattRequestHandler = (ctx: SlattContext) => Promise<SlattRequestHandler | void> | SlattRequestHandler | void
-export type SlattMiddleware = (handler?: SlattRequestHandler) => SlattRequestHandler
-export type SlattRoute = [string, SlattRequestHandler]
-export type SlattRouteHandler = (path: string, handler: SlattRequestHandler) => SlattRoute
-export type SlattApp = (...routes: SlattRoute[]) => SlattRequestHandler
+export type CobainRequestHandler = (ctx: CobainContext) => Promise<CobainRequestHandler | void> | CobainRequestHandler | void
+export type CobainMiddleware = (handler?: CobainRequestHandler) => CobainRequestHandler
+export type CobainRoute = [string, CobainRequestHandler]
+export type CobainRouteHandler = (path: string, handler: CobainRequestHandler) => CobainRoute
+export type CobainApp = (...routes: CobainRoute[]) => CobainRequestHandler
 
 /**
  * Creates an application that matches a request route path.
@@ -88,7 +88,7 @@ export type SlattApp = (...routes: SlattRoute[]) => SlattRequestHandler
  * @param routes The routes that are specific to this application.
  * @returns The route that matches the request.
  */
-export const app: SlattApp = (...routes) => {
+export const app: CobainApp = (...routes) => {
     const [, handler] = routes[0]
     return handler
 }
@@ -99,7 +99,7 @@ export const app: SlattApp = (...routes) => {
  * @param handler The request handler.
  * @returns A route definition [path, handler]
  */
-export const route: SlattRouteHandler = (path, handler) => {
+export const route: CobainRouteHandler = (path, handler) => {
     const proxy = new Proxy({}, {
         get(target, prop, receiver) {
 
@@ -111,9 +111,9 @@ export const route: SlattRouteHandler = (path, handler) => {
 
 /*
 
-const allUsers = (ctx: SlattContext) => {}
-const user = (ctx: SlattContext) => {}
-const profile = (ctx: SlattContext) => {}
+const allUsers = (ctx: CobainContext) => {}
+const user = (ctx: CobainContext) => {}
+const profile = (ctx: CobainContext) => {}
 
 const users = app({
     '/': route(auth(allUsers)).get,
@@ -131,7 +131,7 @@ const posts = app({
     route('/:id/profile', profile) // defaults to .get
 })
 
-const myAppName = slatt()(
+const myAppName = cobain()(
     auth(
         users,
         posts
